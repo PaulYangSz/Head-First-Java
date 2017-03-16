@@ -6,14 +6,36 @@ public class RyanAndMonicaJob implements Runnable
     
     public static void main(String[] args) {
         RyanAndMonicaJob theJob = new RyanAndMonicaJob();
-        Thread one = new Thread(theJob);
-        Thread two = new Thread(theJob);
+        WithdrawJob wJob = theJob.new WithdrawJob();
+        IncrementsJob iJob = theJob.new IncrementsJob();
+        Thread one = new Thread(wJob);
+        Thread two = new Thread(iJob);
         one.setName("Ryan");
         two.setName("Monica");
         one.start();
         two.start();
     }
     
+    public class WithdrawJob implements Runnable 
+    {
+    	public void run() {
+    		for(int i = 0; i < 10000; i++)
+    		{
+        		account.withdraw(1);
+    		}
+            System.out.println(Thread.currentThread().getName() + " withdraw " + account.getBalance());
+    	}
+    }
+    
+    public class IncrementsJob implements Runnable {
+    	public void run() {
+    		for(int i = 0; i < 10000; i++)
+    		{
+    			account.increments(1);
+    		}
+            System.out.println(Thread.currentThread().getName() + " incre " + account.getBalance());
+    	}
+    }
     public void run()
     {
         for (int x = 0; x < 10; x++) {
@@ -54,7 +76,11 @@ class BankAccount {
         return balance;
     }
     
-    public void withdraw(int amount) {
+    public synchronized void withdraw(int amount) {
         balance = balance - amount;
+    }
+    
+    public void increments(int amount) {
+        balance = balance + amount;
     }
 }
